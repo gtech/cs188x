@@ -1,0 +1,829 @@
+* Week 1
+
+** Lecture 1
+*** Search problem
+Search problems are just models
+
+
+**** state space
+**** successor function
+models how you think the world works
+action and costs
+Takes a state, where you can get, what actions to achive that, and what it costs
+**** Start state
+***** World state
+every last detail
+generally don't want to plan over it
+***** search state
+model keeping only the detail needed
+We abstract because most interesting problems have world states exponentially large
+
+
+**** Goal test
+
+*** Solution
+Sequence fo actions(plan) which transforms the start state to a state that passes the goal test.
+
+
+We attempt to model as little the world state as possible in order to satisfy the goal test.
+
+number of dots, positions of dots, time that power lasts, positions of power dots, position of pacman
+
+*** Steps
+
+***** Formulate the search problem
+
+****** State Space Graph
+Nodes are abstraction of world configurations
+Arcs are successors
+Goal test is a set of goal nodes
+Each state occurs only once
+We do not build the whole thing
+
+****** Search Tree
+Start state at the root
+Children are successors
+"What if"
+Nodes show states, but correspond to plans
+
+******* Searching a Search Tree
+Fringe are the nodes currently being considered for being goal states
+
+Expansion means taking add the new plans to the fringe
+
+Exploration Strategy is where you choose to go next
+
+
+
+
+******** Search algorithm properties
+
+
+********* Depth first
+
+Complete: guaranteed to find a solution if it exists?
+If finite yes
+
+Optimal?
+No
+
+branching factor is the maximum number of branches availiable from a state
+
+B = branching factor m = length of bottom of the tree
+
+Time complexity?
+Number of nodes to expand B^m
+
+Space complexity?
+
+Fringe is Bm large
+
+
+********* Breadth first
+B = branching factor m = length of bottom of the tree, s = depth of shallowist
+
+time complexity b^s
+space complexit = b^s
+
+still exponentional
+
+it is complete if a solution exists, because the depth of a search is always finite
+
+Optimal? Yes if the costs are all 1
+
+***** Solve it
+The solution uses an opaque Start State, Successor function, and goal test
+** Lecture 2
+*** Heuristic
+Function(World State) returns numbers
+tells you how close you are to the goal
+
+
+*** Greedy search
+Goes to whatever has the best heuristic number
+*** A*
+
+
+h(n) heuristic cost for that node
+
+g(n) entire sum of action cost for that node, path cost aka backward cost 
+
+f(n) = g(n) + h(n)
+
+Extremely important to end when you dequeue the goal, not enqueue
+
+inadmissible(pessimistic) = heuristic says you are further from the goal than you are
+
+admissible(optimistic) = 
+
+A* is only optimal if the heuristic is admissible
+
+*** Computing heuristics
+**** Relaxed problem
+Make a problem which is either easier or the same difficulty.
+
+**** Sometimes a little bit of inadmissibility is okay if it gains in speed
+*** What is tree search?
+UCS when h=0
+*** Graph Search
+Keep a **SET** of nodes which have been expanded.
+Only expand nodes which don't exist in the set
+Complete
+Not optimal because we may have the wrong subtree unless consistent
+
+
+**** Stronger admissibility neccessary
+Estimated heauristic cost must be consistent
+h(A)  - h(C) <= cost(A to C)
+Consequences
+f value will never decrease
+h(A) <= Cost(A to C) + h(C)
+
+
+S
+SA
+SB
+
+SAB
+SABG
+
+SAC
+SACG
+
+SBG
+
+* Week 2
+
+An agent gives all the information necessary to show one state, and enough information to tell if it meets the goal state.
+
+1. state space
+encodes how the world is at a certain point along the solution
+abstraction of the world
+
+
+2. successor function
+
+models how the world works
+
+takes a state and tells you:
+where you can go immediately
+what actions achieve that
+and what are the costs
+
+
+3. solution or plan
+a sequence of actions which moves the start state to the goal state
+
+
+
+world state is absolutely everything that exists which you don't need to model it all
+
+search state is an abstraction of only what we need
+*** Admissibility
+Heauristic cost is less than or equal to the actual cost to the goal.
+
+*** Consistency
+Heuristic cost <= actual cost for each arc
+
+** THERE ARE TWO WAYS TO SHOW A HEURISTIC IS ADMISSIBLE
+You can prove from first principles
+or
+
+
+second packman heuristic: find straight path, for every wall section obstructing your path perpendicularly in both directions add 2
+
+
+** Homework handout 1 week 2
+
+g = V+1 when agent is ideal when running in straight line to goal
+
+we want to find how little we need to dampen the distance to goal in order to make in more optimistic than the ideal: g = v+1
+
+First:
+
+We need to know the relationship between distance and ideal v.
+
+distance traveled decelerating from v = 1 + 2 + 3 + ... + v OR sigma(1,v,n)
+
+sigma(1,v,n) = ((v+1)v)/2 = theta
+
+1 2 3 4 5
+5 4 3 2 1
+
+d = manhatten distance
+
+h(v,d) = theta + 1
+
+as d increases so does h
+
+when d = theta + 1
+g = v + 1
+h = v + 1
+
+when d + 1 theta + 2
+g = v + 2
+so h = v + 2
+
+so h = v + 1 when v <= v_max
+
+5 4 3 2 1 0
+5 4 3 2 1 1 0
+5 4 3 2 2 1 0
+5 4 3 3 2 1 0
+5 4 3 2 2 2 
+5 5 4 3 2 1 0
+
+What about v_max ?
+
+when d > theta due to v_max
+
+3 3 3 2 1 0
+3 3 3 3 2 1 0
+
+what about when when theta(v_max) < d ?
+
+g increases during v_ideal % v_max != 0?
+
+yeah, because when n = step = 1, [sigma 0 to inf (n)] < [sigma 0 to inf (vn)]
+
+*** Thus h = v+1 < g always
+
+now we can introduce  second term for acceleration
+
+the term must be zero when we can only decelerate or coast
+
+mysterious ski
+* Week 3
+Search is for:
+One agent
+deterministic actions
+fully observed state
+discreet state space
+
+
+Planning: sequence of actions
+You're looking for the path, not the goal
+
+assignment definition: A set of variables which are defined through the search, when the assignment is complete then it is a goal
+
+
+Identification: assignments to variables
+goal is important, not the path
+all the paths are the same depth
+
+CSP are specialized identification problems
+
+
+The great thing about search problems is that so many functions are black boxes
+
+
+CSPs
+State is defined by variables Xi from a Domain 
+goal test is a set of constraints
+
+
+CSP solvers are usually compiled, and you put in contraints, then it returns your goal.
+Because we can see our variables in a CSP it allows us to develop better algorithms
+** CSP
+Variables
+Domans
+Constraints
+
+Goals
+
+** Map coloring
+Variables: regions
+Domains: colors
+constrants: adjacent regions must have different colors
+
+Implicit: Code snipet
+Explicit: Actual examples
+
+solution: list of regions with their colors
+
+** Queens problem
+
+Variables: Xij
+Domains: {0,1}
+Constrants: 
+
+OR
+
+Variables: Qk
+Domains: {1,2,3..N}
+Constraints:
+Implicit: All i,j queens can't threaten(Qi,Qj)
+
+** Formulation 2 is probably better because more information of the problem is baked into the structure of the variables and constrants, rather than listing a massive amount of constrants or variables
+
+
+** Constraint graphs
+variables are nodes
+constraints are edges
+
+Useful for quickly formulating the problem you can traverse
+
+constrants which are more than binary are signified as a square and connected to all variables
+
+** Varieties of constraints
+unary
+binary
+higher-order 3 or more variables
+
+proferences(soft constrants)
+You can you a cost function, but this means it's no longer a CSP
+
+** How to solve them
+
+Initial state: empty assignment {}
+Successor function: assign a value to an unassigned variable
+Goal test: is current assignment complete and does it satisfy all constraints
+
+
+*** Backtracking search
+One variable at a time
+check the constrants as you go
+
+DFS + Variable Ordering + Failure on Constraint Violation
+
+
+**** Improving it
+
+***** Ordering
+Which variable should be assinged next?
+Which order should the variables be tried?
+
+Minimum Remaining Values:
+Fail fast ordering: Go to the most constrained variables first, so that you won't have to backtrack as much. Finding out at the bottom of the tree is exponentially worse. You have to assign all the variable no matter what.
+
+LCV: Least Constraining Value
+For values it's opposite. Try the least constraining values first. You don't have to try all of them, so take the ones which are most likely to give you a goal.
+
+
+***** Filtering
+Can we detect failure early?
+Filtering: Keep track of domains for unassigned variables and cross off bad options
+
+
+****** Forward Checking
+Cross off values from the domain for non assigned variables which violate constrants when the next variable is assigned
+
+Cannot see ahead to see if a domain has been exhausted.
+****** Constraint Propagation
+
+******* Enforcing arc consistency
+Arc: Directed edge
+
+Arc X -> Y is consistent if for every x in the tail there is some y in the head which could be assigned without violating a constraint
+X: values in the domain of a variable to be assigned
+Y: value which can tentitivley be assigned to the current variable
+
+Cop analogy. Always delete from the tail of the arc.
+
+d^3 * n^2 time
+****** K-Consistency
+
+3-Consistency is called path consistency.
+
+
+***** Structure
+Can we exploit the problem structure?
+
+Separating into subproblems vastly increases the efficiency
+
+n variables
+c variables per sub problem
+d domain
+
+O((n/c)(d^c)) vs d^n
+
+
+
+
+****** Tree structure CSP
+Backward arc consistency, then forward assignment has
+O(nd^2) time
+
+****** Cutset Conditioning
+
+Find the smallest number of nodes which when taken out of the graph leave it as a tree. Add its contraint into its touching nodes and pull them off the graph
+
+****** Tree decomposition
+
+Encapsulate into mega variables for smaller problems
+
+*** Local Search
+
+successor function modifies in process solution, instead of extending it.
+
+Faster and more memory efficient, but does not guaruntee completeness or optimality.
+
+**** Iterative Improvement Algorithms
+Instance of *local search*
+
+Start with an incorrect assignment, then solve conflicts.
+
+Algorithm:
+Randomly select a variable which is conflicted, and assign it a new value
+Min-Conflict heuristic: Chose value which violates the fewest constraints
+
+
+Min-Conflicts solves most problems in constant time. There are problems when a problem is somewhat constrained and there are a moderate number of variables, which means you have to do a massive amount of trial and error before you'll get to a local state which fails.
+
+Is not garunteed to work since you don't have a fringe, thus cannot keep track of where you've been.
+
+**** Hill climbing
+Always go uphill
+
+
+
+
+**** Simulated annealing
+
+Some randomness
+
+Temperature
+
+If it's better than current, take it.
+
+If not, the higher the temperature, the more likely you'll take it.
+
+Guarunteed to reach the optimum, very VEEEEEEERY slowly.
+
+**** Genetic algorithms
+
+Selection
+
+Crossover function
+
+Mutation
+
+Selection is hill climbing, 
+crossover function is looking in the neighborhood
+Mutation is annealing
+**
+** Homework
+
+*** 1
+Variables: Class 1,2,3,4,5
+Domain: Professors A, B, C
+
+Class 1 2 and 5 can only have Professor A
+Class 3 4 and 5 can only have Professor B
+Class 1 3 and 4 can only have Professor C
+All classes may only have one value
+Classes with overlapping timeslots cannot have the same variable
+
+c1 {A,C}
+c2 {A}
+c3 {B, C}
+c4 {B,C}
+c5 {A,B}
+
+*** 2
+
+There is a simple polynomial(nd^2) timed algorithm which give a garunteed solution if availiable using backward constraint consistency, then forward assignment without backtracking.
+
+
+*** 2
+
+
+**** 1
+
+
+
+**** 2
+
+X1 {P}
+
+x2 {G,E}
+
+x3 {G,E}
+
+x4 {G,E}
+
+x5 {P}
+
+x6 {G,E,P}
+
+x3 =/= x4
+
+x2 =/= x3
+
+x3 == E or x2 == x4 == E
+
+**** 3
+
+x1 or x5
+
+**** 4
+
+* Week 4
+
+** Minimax
+
+test terminal state while taking the value
+
+*** Resource limits
+
+evaluation function
+
+non-terminal position, assign guesses for terminal values
+
+not garunteed optimality
+iterative deepening becomes possible
+
+** Quiz 3
+
+6 8
+7
+
+** Probabilities
+
+The expected value is the average of the probability weighted values of its children
+'The expected value of a function of a random variable is the average, weighted by the probability distribution over outcomes'
+
+If you have you and your adversary modeling each other's probabilities, you approach minimax
+
+minimax does well in all cases, but takes longer when it isn't adversarial.
+
+expectimax without assuming an adversarry gets mugged a lot.
+
+*** Expectiminimax
+
+Chance node between the min and max modes when there is a random environmental factor. E.g. Backgammon
+
+
+Going deeper into the tree becomes extremely difficult because the braching factor increases.
+
+
+However limiting depth is less damaging because the probability of reaching any one node is very small
+
+*** Multiagent
+
+The values of nodes for each of the agents, can make cooperation or competition arise via emergence.
+
+
+*** Uilities
+
+Function from a state which outputs a real number based on all of an agents preferences
+
+A prize is the result of a lottery.
+
+A preference is judgement between two prizes.
+
+You take your utilities, and put them into a function to dictate behavior.
+
+
+You do this to prechoose what you want to happen, if the agent did this itself, it would choose a utility which was easiest to maximize. e.g. vaccume sitting there
+
+Utilities  as an input allows us to use them to evaluate states for the use of expectimax. e.g. ice cream cones
+*** Axioms of Rationality
+
+Orderability
+Transitivity
+Continuity
+Substitutibility
+Monotonicity
+
+
+If you obey them, you have rationality.
+
+* Week 5
+
+Preset state, the futuer, and the past are independent
+
+Remeber to define trasitions to depend only on the current state, not on the previous states.
+
+High living cost renders a depressed agent
+
+** Policy gives an action for each state
+
+optimal policy, is the policy which maximizes the agent's utility for each state
+
+
+** MDP(Markov Decision Process) Search Trees
+
+state: s
+q-states: (s,a) 
+transition: T(s,a,s') = P(s'|s,a) , 
+Reward:  R(s,a,s')
+
+
+** Now or later?
+
+You can make rewards decay exponentially to encourage speed
+** Games which last forever
+
+Bad because a string of states with differing values look the same when the game doesn't end
+
+*** Terminate episodes after fixed T steps
+
+*** Exponentially discount the reward
+
+smaller \gamma means shorter horizon
+0< \gamma < 1
+
+*** Ending has a discrete possiblitiy for every move
+
+** Utility
+Sum of(discounted) rewards
+
+** V^*(s)
+ expected utility starting in s and acting optimally
+
+V^*(s) = max_a Q^*(s,a)
+
+Bellman equation
+
+V^*(s) = max_a \Sigma_s' T(s,a,s^')[R(s,a,s^') + \gamma V^*(s^')]
+
+** Q^*(s,a)e
+
+Same but the action has already been commited to
+
+Q^*(s,a) = \Sigma_s' T(s,a,s^')[R(s,a,s^') + \gamma^t V^*(s^')]
+
+** \pi^*(s)
+
+Optimal policy from state s
+
+
+** V_k ^*(s)
+Optimal expected utility when ending after k steps
+
+
+** * means optimal
+
+** Bellmman Equations
+
+Step 1: Take the correct first action
+
+Step 2: Keep acting optimally
+
+V^*(s) = max_a Q^*(s,a)
+Q^*(s,a) = \Sigma_s' T(s,a,s')[R(s,a,s') + \gamma V^*(s')]
+
+Usually written with Q inline:
+
+V^*(s) = max_a \Sigma_s' T(s,a,s')[R(s,a,s') + \gamma V^*(s')]
+
+V^*(s)                             | optimal value
+max_a                              | max over the actions
+\Sigma_s' T(s,a,s')                    | average the values
+[R(s,a,s') + \gamma V^*(s')]           | instantaneous value, discounted future values by recursing
+
+These are not an algorithm, but when you plug in the correct values for the equasions to hold, they are optimal.
+
+** Value Iteration
+Implementing Bellman Equations
+
+V_(k+1)(s) \larr max_a \Sigma_s' T(s,a,s')[ R(s,a,s') + \gamma V_k(s') ]
+
+k+1 allows us to pick a spot to start at, because in implementation we must be finite
+\larr assignment is necessary to implement into code
+
+A fixed point method of solving these equations
+This is a general way of solving fixed point methods
+
+
+*** Algorithm
+
+V_0(s) = 0: No time steps left
+
+V_(k+1)*(s) \larr max_a \Sigma_s' T(s,a,s')[ R(s,a,s') + \gamma V^*(s') ]
+We do a small search for each state, bottom up so we don't recurse, we already have those values cached
+
+Given vector of V_k(s) values, do one ply of expectimax from each state
+
+Each iteration is: O(s^2 a)
+
+tradeoff: good it doesn't grow with the number of iterations, expectimax does not have to touch every state though due to pruning
+
+*** Convergence
+
+You can only say that it will convege if:
+
+**** 1. Tree has maximum depth M, V_m holds the actualy untruncated values
+
+
+**** 2. As k increases, each successive k+1 decreases exponentially. At some point it converges on some value as each successive iteration adds negligible amounts to V
+     
+** REMEMBER rewards are instantaneous, values are cumulative
+** Fixed policies
+*** Policy evaluation
+We turn the bellman equations into updates
+
+V^\pi(s) = expected total discounted rewards fstarting in s and following the policy \pi
+
+V_(k+1) ^\pi(s) \larr \Sigma_s' T(s,\pi(s),s')[ R(s,\pi(s),s') + \gamma V_k ^\pi(s') ]
+
+Two benefits fall out:
+
+faster: O(s^2)
+Without max the equations are linear, and thus can be solved that way.
+
+Con:
+Not optimal 
+
+
+** policy extraction
+Computing actions from values
+
+\pi^*(s) = optimal policy action for state s
+
+\pi^*(s) = argmax_a \Sigma_s' T(s,a,s')[ R(s,a,s') + \gamma V^*(s') ]
+
+Q values are useful because they make policy extraction trivial
+
+\pi^*(s) = argmax_a Q^*(s,a)
+
+
+** Policy Iteration
+
+V_(k+1)(s) \larr max_a \Sigma_s' T(s,a,s')[ R(s,a,s') + \gamma V_k(s') ]
+
+Problems with value iteration:
+1. slow O(s^2 a)
+2. The max at each s rarely changes
+3. the policy often converges long before the values
+
+Optimal
+Can converge much faster under certain conditions
+
+Alternative way:
+*** Policy Evaluation
+Calculate utilities for a fixed given policy until convergence
+
+fixed \pi
+
+iterate until values converge
+
+
+
+*** Policy Improvement
+Update the policy using a one-step look-ahead with the resulting converged utilities as future values
+*** Repeat until convergence
+** Summary
+
+In the end it's the bellman equations turned into iterative algorithms using one step expectimax.
+* Week 6
+
+** Passive Reinforcement Learning
+Reinforcement Learning: Unknown T and R values
+
+Offline reinforcement learning, does not change policy while executing, just watches taking data for T and R.
+
+Model Free:
+Execute the policy over and over, and average all the values of each state
+
+Pro: 
+It's easy and will converge
+
+Con:
+Wastes information
+Each state must be learned, so it takes a long time to converge
+** Temporal difference learning
+You don't know if you'll ever get back to a state, so you must be okay with learning something from every sample.
+
+Policy fixed, evalution
+
+move volues towards value of whatever successor occurs: running average
+
+sample = R(s,\pi(s),s') + \gamma V^\pi(s')
+
+update to V(s):  V^\pi(s) \larr (1-\alpha)*V^\pi(s) + (\alpha)sample
+
+** Active reinforcement learning -- Q learning
+Q-value updates to each q-state:
+
+Q_(k+1)(s,a) \larr \Sigma_s' T(s,a,s')[ R(s,a,s') + \gamma max_a' Q_k (s',a') ]
+
+Running average:
+
+Q(s,a) \larr (1-\alpha)Q(s,a)+(\alpha)[ r + \gamma max_a' Q(s',a') ]
+
+off-policy learning:
+policy converges even if you're not following the same policy
+
+You eventually have to make the learning rate small enough
+If you experiment too much you'll wrack up a lot of regret
+
+caveats:
+
+You must explore enough
+The learning rate must eventually be small enough so you can construct a reasonable average
+but you can't decrease it too quickly because you'll stop learning
+
+** Model free learning -- experience the world through episodes
+
+** Exploration, Exploitation, and regret
+
+
+* Lambda Calculus
+composed of terms:
+
+
+variables
+\lambda x.t -- lambra abstraction
+t s -Application
